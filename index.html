@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Question for Misty</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a0a2e, #2d1b4e, #1a0a2e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Floating hearts background */
+    .hearts-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-heart {
+      position: absolute;
+      font-size: 1.5rem;
+      opacity: 0.15;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.15;
+      }
+      90% {
+        opacity: 0.15;
+      }
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Question page */
+    #question-page {
+      text-align: center;
+      z-index: 10;
+      position: relative;
+    }
+
+    .question-title {
+      font-size: 3rem;
+      color: #ff6b9d;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .question-text {
+      font-size: 1.8rem;
+      color: #f0c0d0;
+      margin-bottom: 3rem;
+      font-style: italic;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3rem;
+      position: relative;
+      min-height: 200px;
+    }
+
+    .btn-yes {
+      padding: 18px 50px;
+      font-size: 1.5rem;
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #ff6b9d, #ff3370);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, padding 0.2s ease, font-size 0.2s ease;
+      box-shadow: 0 5px 25px rgba(255, 51, 112, 0.5);
+      z-index: 10;
+    }
+
+    .btn-yes:hover {
+      box-shadow: 0 8px 35px rgba(255, 51, 112, 0.7);
+      filter: brightness(1.1);
+    }
+
+    .btn-no {
+      padding: 18px 50px;
+      font-size: 1.5rem;
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #888, #666);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      position: fixed;
+      transition: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+
+    /* Answer page */
+    #answer-page {
+      display: none;
+      text-align: center;
+      z-index: 10;
+      position: relative;
+      animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .answer-image {
+      max-width: 400px;
+      width: 90vw;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(255, 107, 157, 0.4);
+      margin-bottom: 2rem;
+      border: 3px solid rgba(255, 107, 157, 0.5);
+    }
+
+    .answer-text {
+      font-size: 1.6rem;
+      color: #f0c0d0;
+      max-width: 600px;
+      line-height: 1.6;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .answer-text strong {
+      color: #ff6b9d;
+    }
+
+    .celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .confetti-heart {
+      position: absolute;
+      font-size: 2rem;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-20px) rotate(0deg) scale(0);
+        opacity: 1;
+      }
+      20% {
+        transform: translateY(10vh) rotate(120deg) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(105vh) rotate(720deg) scale(0.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating hearts background -->
+  <div class="hearts-bg" id="hearts-bg"></div>
+
+  <!-- Question Page -->
+  <div id="question-page">
+    <div class="question-title">Misty...</div>
+    <div class="question-text">Will you be my Valentine?</div>
+    <div class="buttons-container">
+      <button class="btn-yes" id="btn-yes">Yes</button>
+    </div>
+  </div>
+
+  <!-- No button lives outside the container so it can move freely -->
+  <button class="btn-no" id="btn-no">No</button>
+
+  <!-- Answer Page -->
+  <div id="answer-page">
+    <img src="image.jpg" alt="Us" class="answer-image" />
+    <p class="answer-text">
+      Great, pick me up from the Columbus Airport on Thursday night at 7 PM, and you have yourself a date!
+    </p>
+  </div>
+
+  <!-- Celebration container -->
+  <div class="celebration" id="celebration"></div>
+
+  <script>
+    // --- Floating hearts background ---
+    const heartsBg = document.getElementById('hearts-bg');
+    const heartEmojis = ['\u2764\uFE0F', '\uD83D\uDC95', '\uD83D\uDC96', '\uD83E\uDE77', '\uD83D\uDC97'];
+    for (let i = 0; i < 20; i++) {
+      const heart = document.createElement('span');
+      heart.classList.add('floating-heart');
+      heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.animationDuration = (8 + Math.random() * 12) + 's';
+      heart.style.animationDelay = (Math.random() * 15) + 's';
+      heart.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+      heartsBg.appendChild(heart);
+    }
+
+    // --- Button logic ---
+    const btnYes = document.getElementById('btn-yes');
+    const btnNo = document.getElementById('btn-no');
+    const questionPage = document.getElementById('question-page');
+    const answerPage = document.getElementById('answer-page');
+
+    let growCount = 0;
+    const FLEE_DISTANCE = 180; // how close the cursor must get before "No" runs
+
+    // Position the No button initially
+    function initNoButton() {
+      const yesRect = btnYes.getBoundingClientRect();
+      btnNo.style.left = (yesRect.right + 50) + 'px';
+      btnNo.style.top = yesRect.top + 'px';
+    }
+
+    window.addEventListener('load', initNoButton);
+    window.addEventListener('resize', initNoButton);
+
+    // Track mouse and make "No" flee
+    document.addEventListener('mousemove', (e) => {
+      const rect = btnNo.getBoundingClientRect();
+      const btnCenterX = rect.left + rect.width / 2;
+      const btnCenterY = rect.top + rect.height / 2;
+
+      const dx = e.clientX - btnCenterX;
+      const dy = e.clientY - btnCenterY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < FLEE_DISTANCE) {
+        fleeFrom(e.clientX, e.clientY, rect);
+      }
+    });
+
+    // Also handle touch for mobile
+    document.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      const rect = btnNo.getBoundingClientRect();
+      const btnCenterX = rect.left + rect.width / 2;
+      const btnCenterY = rect.top + rect.height / 2;
+
+      const dx = touch.clientX - btnCenterX;
+      const dy = touch.clientY - btnCenterY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < FLEE_DISTANCE) {
+        fleeFrom(touch.clientX, touch.clientY, rect);
+      }
+    });
+
+    function fleeFrom(cursorX, cursorY, rect) {
+      const btnCenterX = rect.left + rect.width / 2;
+      const btnCenterY = rect.top + rect.height / 2;
+
+      // Calculate flee direction (away from cursor)
+      let angle = Math.atan2(btnCenterY - cursorY, btnCenterX - cursorX);
+
+      // Add some randomness so it's playful
+      angle += (Math.random() - 0.5) * 1.2;
+
+      const fleeDist = 150 + Math.random() * 100;
+      let newX = btnCenterX + Math.cos(angle) * fleeDist - rect.width / 2;
+      let newY = btnCenterY + Math.sin(angle) * fleeDist - rect.height / 2;
+
+      // Keep within viewport bounds with padding
+      const pad = 10;
+      const maxX = window.innerWidth - rect.width - pad;
+      const maxY = window.innerHeight - rect.height - pad;
+
+      // If it would go out of bounds, pick a random safe spot away from cursor
+      if (newX < pad || newX > maxX || newY < pad || newY > maxY) {
+        for (let attempt = 0; attempt < 20; attempt++) {
+          newX = pad + Math.random() * (maxX - pad);
+          newY = pad + Math.random() * (maxY - pad);
+          const dxNew = cursorX - (newX + rect.width / 2);
+          const dyNew = cursorY - (newY + rect.height / 2);
+          if (Math.sqrt(dxNew * dxNew + dyNew * dyNew) > FLEE_DISTANCE + 50) break;
+        }
+      }
+
+      btnNo.style.left = newX + 'px';
+      btnNo.style.top = newY + 'px';
+
+      // Grow the Yes button
+      growCount++;
+      const scale = 1 + growCount * 0.06;
+      btnYes.style.transform = `scale(${Math.min(scale, 4)})`;
+    }
+
+    // --- Yes button click ---
+    btnYes.addEventListener('click', () => {
+      questionPage.style.display = 'none';
+      btnNo.style.display = 'none';
+      answerPage.style.display = 'block';
+
+      // Launch celebration hearts
+      launchCelebration();
+    });
+
+    function launchCelebration() {
+      const container = document.getElementById('celebration');
+      for (let i = 0; i < 50; i++) {
+        const heart = document.createElement('span');
+        heart.classList.add('confetti-heart');
+        heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDuration = (2 + Math.random() * 3) + 's';
+        heart.style.animationDelay = (Math.random() * 2) + 's';
+        heart.style.fontSize = (1 + Math.random() * 2) + 'rem';
+        container.appendChild(heart);
+      }
+    }
+  </script>
+</body>
+</html>
